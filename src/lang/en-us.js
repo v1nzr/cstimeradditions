@@ -147,6 +147,7 @@ var FONTMGR_EMPTY = 'No custom fonts added yet. Click "Add font..." to upload a 
 var FONTMGR_PROMPT_NAME = 'Name this font (used to select it in the timer/interface font lists)';
 var FONTMGR_INVALID = 'Please choose a .woff, .woff2, .ttf or .otf font file';
 var FONTMGR_REMOVE_CFM = 'Remove this custom font?';
+var OPT_SEARCH_PLACEHOLDER = 'Search settings...';
 var PROPERTY_FORMAT = 'time format';
 var PROPERTY_USEKSC = 'use keyboard shortcut';
 var PROPERTY_USEGES = 'use gesture control';

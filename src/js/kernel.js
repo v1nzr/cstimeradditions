@@ -68,7 +68,31 @@ var kernel = execMain(function() {
 		var table = $('<table class="options" />');
 		var left = $('<td />');
 		var right = $('<td />').addClass('tabValue');
-		table.append($('<tr />').append(left, right.append(scrollDiv.append(optTable))));
+		var searchInput = $('<input type="text" class="optsearch">').attr('placeholder', OPT_SEARCH_PLACEHOLDER).on('input', filterOptions);
+		var searchWrap = $('<div class="optsearchwrap">');
+		table.append($('<tr />').append(left, right.append(searchWrap.append(searchInput, scrollDiv.append(optTable)))));
+
+		function filterOptions() {
+			var term = searchInput.val().trim().toLowerCase();
+			var firstMatch = null;
+			optTable.find('tr[data-module]').not('.modulehead').each(function() {
+				var row = $(this);
+				var match = !term || row.text().toLowerCase().indexOf(term) >= 0;
+				row.toggle(match);
+				if (match && !firstMatch) {
+					firstMatch = row.attr('data-module');
+				}
+			});
+			optTable.find('tr.modulehead').each(function() {
+				var module = $(this).attr('data-module');
+				var anyVisible = !term || optTable.find('tr[data-module="' + module + '"]:not(.modulehead):visible').length > 0;
+				$(this).toggle(anyVisible);
+			});
+			if (term && firstMatch) {
+				switchLeftModule(firstMatch);
+				scrollToModule(firstMatch);
+			}
+		}
 
 		var selectedTab = 0;
 		var prevScrollTop = 0;
@@ -178,7 +202,7 @@ var kernel = execMain(function() {
 				}
 				var curDiv = subDivs[module] = [$('<div>'), $('<tr>')];
 				curDiv[0].html('<span class="icon" style="font-size:1em;">' + moduleIcon[module] + '</span><span>' + MODULE_NAMES[module] + '</span>').addClass('tab').data('module', module).click(tabClick).appendTo(left);
-				curDiv[1].append(
+				curDiv[1].addClass('modulehead').attr('data-module', module).append(
 					$('<th>').html('<span class="icon">' + moduleIcon[module] + '</span> ' + MODULE_NAMES[module].replace(/-?<br>-?/g, '')),
 					$('<th class="sr">').html(PROPERTY_SR),
 					$('<th class="sr">').html('<span class="icon">\ue9bb</span>')
@@ -246,7 +270,7 @@ var kernel = execMain(function() {
 					if ($('strong[data="opt_' + key + '"]').length > 0) {
 						valTd.append($('<span class="click opthelp" data="' + key + '"/>').html(DEFAULT_HELP_SPAN).click(procClick));
 					}
-					optTable.append($('<tr>').append(valTd, srTd));
+					optTable.append($('<tr data-module="' + module + '">').append(valTd, srTd));
 				}
 			}
 			optTable.append($('<tr style="height: 10em;">'));
@@ -259,6 +283,8 @@ var kernel = execMain(function() {
 				isDivOut = false;
 			}
 			$('.opthelp').html(DEFAULT_HELP_SPAN);
+			searchInput.val('');
+			filterOptions();
 			scrollToModule();
 
 			ui.showDialog([table, $.noop, undefined, $.noop, [RESET_LANG, function(){
@@ -267,6 +293,7 @@ var kernel = execMain(function() {
 				}
 				resetPropertyes();
 				generateDiv();
+				filterOptions();
 				return false;
 			}], [BUTTON_EXPORT.replace(/-?<br>-?/g, ''), exportFunc.exportProperties], [FONTMGR_BUTTON, function() {
 				customFont.show();

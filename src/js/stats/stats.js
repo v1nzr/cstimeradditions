@@ -95,14 +95,55 @@ var stats = execMain(function(kpretty, round, kpround) {
 			}
 			n_del = 1;
 		}
+		var removedTimes, removedExtra;
 		rollBackExec(index, function() {
-			times.splice(index, n_del);
-			timesExtra.splice(index, n_del);
+			removedTimes = times.splice(index, n_del);
+			removedExtra = timesExtra.splice(index, n_del);
 		});
+		lastDeleted = {index: index, times: removedTimes, extra: removedExtra};
+		showUndoToast();
 		sessionManager.save(index);
 		table_ctrl.updateTable(false);
 		updateUtil(['delete', index, n_del]);
 		return true;
+	}
+
+	var lastDeleted = null;
+	var undoToastTimer;
+	var undoToast = $('<div class="undotoast">').append(
+		$('<span>').text(STATS_DEL_TOAST),
+		$('<span class="click undotoastlink">').text(STATS_UNDO).click(function() {
+			undoDelete();
+		})
+	);
+
+	function showUndoToast() {
+		clearTimeout(undoToastTimer);
+		undoToast.stop(true, true).appendTo('body').css('opacity', 0).show().animate({opacity: 1}, 150);
+		undoToastTimer = setTimeout(hideUndoToast, 5000);
+	}
+
+	function hideUndoToast() {
+		clearTimeout(undoToastTimer);
+		undoToast.stop(true, true).animate({opacity: 0}, 150, function() {
+			undoToast.hide();
+		});
+	}
+
+	function undoDelete() {
+		if (!lastDeleted) {
+			return;
+		}
+		var data = lastDeleted;
+		lastDeleted = null;
+		hideUndoToast();
+		rollBackExec(data.index, function() {
+			times.splice.apply(times, [data.index, 0].concat(data.times));
+			timesExtra.splice.apply(timesExtra, [data.index, 0].concat(data.extra));
+		});
+		sessionManager.save(data.index);
+		table_ctrl.updateTable(false);
+		updateUtil(['undo', data.index]);
 	}
 
 	function getMean(dim) {

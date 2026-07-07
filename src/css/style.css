@@ -333,10 +333,15 @@ html:not(.m) #leftbar div > div:hover > span, #leftbar div > div > span.icon, #l
 	border-style: outset;
 	border-width: 1px;
 	border-width: 0.1rem;
+	transition: background-color 0.15s ease, filter 0.15s ease, transform 0.1s ease;
 }
 
 .mybutton.enable, .tab.enable {
 	border-style: inset;
+}
+
+html:not(.m) .mybutton:active, html:not(.m) .click:active, html:not(.m) .tab:active {
+	transform: scale(0.96);
 }
 
 #wndctn {
@@ -588,6 +593,7 @@ html:not(.m) .mywindow:hover, html:not(.m) #leftbar:hover {
 .click, .times, .tab {
 	cursor: pointer;
 	border-radius: 0.15em;
+	transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .times.pb {
@@ -1024,6 +1030,7 @@ select, input[type='button'], input[type='text'] {
 	-webkit-appearance: none;
 	-moz-appearance:    none;
 	appearance:         none;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 select {

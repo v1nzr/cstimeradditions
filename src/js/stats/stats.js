@@ -37,6 +37,7 @@ var stats = execMain(function(kpretty, round, kpround) {
 		timesExtra.push(null);
 		times_stats_table.pushed();
 		times_stats_list.pushed();
+		checkNewPB(times.length - 1);
 		sessionManager.save(times.length - 1);
 		if (time.length - 1 > curDim) {
 			table_ctrl.updateTable(false);
@@ -45,6 +46,25 @@ var stats = execMain(function(kpretty, round, kpround) {
 		}
 		updateUtil(['push']);
 		kernel.pushSignal('timestd', times.at(-1));
+	}
+
+	// briefly pulses the averages line when the solve just pushed set a new best single or average
+	function checkNewPB(idx) {
+		if (times.length <= 1) {
+			return;
+		}
+		var isPB = times_stats_table.bestTime >= 0 && times_stats_table.bestTimeIndex == idx;
+		for (var j = 0; !isPB && j < avgSizes.length; j++) {
+			if (times.length >= Math.abs(avgSizes[j]) && times_stats_table.bestAvg(j, 0) >= 0 && times_stats_table.bestAvg(j, 4) == idx) {
+				isPB = true;
+			}
+		}
+		if (isPB) {
+			var avgstr = $('#avgstr');
+			avgstr.removeClass('pbflash');
+			var reflow = avgstr[0].offsetWidth; //restart the CSS animation if it's already running
+			avgstr.addClass('pbflash');
+		}
 	}
 
 	function rollBackExec(idx, func) {
@@ -481,16 +501,6 @@ var stats = execMain(function(kpretty, round, kpround) {
 			cfmIdx = idx;
 			genDiv();
 			cfmDiv.css('font-size', '1.2em');
-			if (action == 'comment') {
-				hideToTools();
-				var newComment = $.prompt('Comment for solve No. ' + (cfmIdx + 1) + ':', cfmTxtR.val());
-				if (newComment == null) {
-					return;
-				}
-				cfmTxtR.val(newComment);
-				procTxt();
-				return;
-			}
 			var params = [cfmDiv, hideToTools, undefined, hideToTools, [STATS_SSSTAT, function(cfmIdx) {
 				hideToTools();
 				setHighlight(times_stats_table, timesAt, cfmIdx, 1, 10, true);
@@ -506,7 +516,9 @@ var stats = execMain(function(kpretty, round, kpround) {
 					kernel.pushSignal('reqrec', [timesAt(cfmIdx), cfmIdx]);
 				}]);
 			}
-			kernel.showDialog(params, 'cfm', 'Solves No.' + (cfmIdx + 1));
+			kernel.showDialog(params, 'cfm', 'Solves No.' + (cfmIdx + 1), action == 'comment' ? function() {
+				cfmTxtR.focus().select();
+			} : undefined);
 		}
 
 		function setPenalty(value, idx) {

@@ -574,6 +574,16 @@ html:not(.m) .mywindow:hover, html:not(.m) #leftbar:hover {
 	font-weight: bold;
 }
 
+@keyframes pbflash {
+	0% { text-shadow: 0 0 0 transparent; }
+	15% { text-shadow: 0 0 0.6em #fc0, 0 0 0.25em #fc0; }
+	100% { text-shadow: 0 0 0 transparent; }
+}
+
+#avgstr.pbflash {
+	animation: pbflash 1.6s ease-out;
+}
+
 a {
 	color: inherit;
 }
@@ -1164,9 +1174,9 @@ html.m .mhide, html:not(.m) .mshow {
 	top: auto;
 	right: 0;
 	width: auto;
-	height: 59px;
-	height: 11.8vw;
-	font-size: 2.5vw;
+	height: 68px;
+	height: 13.6vw;
+	font-size: 2.8vw;
 }
 
 .m #leftbar > div {
@@ -1209,8 +1219,8 @@ html.m .mhide, html:not(.m) .mshow {
 .m #stats {
 	top: auto;
 	max-width: 100%;
-	bottom: 61px;
-	bottom: 11.8vw;
+	bottom: 70px;
+	bottom: 13.6vw;
 	white-space: nowrap;
 	box-sizing: border-box;
 }
@@ -1240,8 +1250,8 @@ html.m .mhide, html:not(.m) .mshow {
 }
 
 .m #toolsDiv {
-	bottom: 61px;
-	bottom: 11.8vw;
+	bottom: 70px;
+	bottom: 13.6vw;
 }
 
 .m #toolsDiv > div > div {
